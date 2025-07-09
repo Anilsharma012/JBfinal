@@ -1,21 +1,21 @@
 import { defineConfig } from "vite";
 import path from "path";
 
-// Server build configuration
+// Server build configuration for Railway
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, "server/node-build.ts"),
+      entry: path.resolve(__dirname, "server/node-build.ts"), // ✅ backend entry file
       name: "server",
-      fileName: "production",
+      fileName: "node-build", // ✅ final output: node-build.mjs
       formats: ["es"],
     },
-    outDir: "dist/server",
-    target: "node22",
+    outDir: "dist/server", // ✅ matches your package.json
+    target: "node20", // ✅ Railway is Node 20 by default (safe)
     ssr: true,
     rollupOptions: {
       external: [
-        // Node.js built-ins
+        // built-in node modules
         "fs",
         "path",
         "url",
@@ -29,16 +29,18 @@ export default defineConfig({
         "buffer",
         "querystring",
         "child_process",
-        // External dependencies that should not be bundled
+
+        // external deps
         "express",
         "cors",
+        "mongoose",
       ],
       output: {
         format: "es",
-        entryFileNames: "[name].mjs",
+        entryFileNames: "[name].mjs", // => node-build.mjs
       },
     },
-    minify: false, // Keep readable for debugging
+    minify: false,
     sourcemap: true,
   },
   resolve: {
@@ -51,4 +53,3 @@ export default defineConfig({
     "process.env.NODE_ENV": '"production"',
   },
 });
-                        
