@@ -54,7 +54,7 @@ export default function ProductForm({
     inStock: true,
   });
 
-  const [errors, setErrors] = useState<Partial<ProductFormData>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (product) {
@@ -80,16 +80,14 @@ export default function ProductForm({
   }, [product, isOpen]);
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<ProductFormData> = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) newErrors.name = "Product name is required";
     if (!formData.description.trim())
       newErrors.description = "Description is required";
-    if (formData.price <= 0)
-      newErrors.price = "Price must be greater than 0";
+    if (formData.price <= 0) newErrors.price = "Price must be greater than 0";
     if (!formData.category) newErrors.category = "Category is required";
-    if (!formData.imageUrl.trim())
-      newErrors.imageUrl = "Image URL is required";
+    if (!formData.imageUrl.trim()) newErrors.imageUrl = "Image URL is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

@@ -12,13 +12,17 @@ import {
 
 const router = express.Router();
 
+// Specific routes MUST come before parameterized routes
+router.get("/stats", getProductStats);
+router.get("/category/:category", getProductsByCategory);
+
+// General CRUD routes
 router.get("/", getAllProducts);
-router.get("/:id", getProductById);
 router.post("/", createProduct);
+
+// Parameterized routes (these must come last)
+router.get("/:id", getProductById);
 router.put("/:id", updateProduct);
 router.delete("/:id", deleteProduct);
-
-router.get("/category/:category", getProductsByCategory);
-router.get("/stats", getProductStats);
 
 export default router;

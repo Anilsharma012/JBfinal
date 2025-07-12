@@ -26,13 +26,15 @@ export default function Certifications() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2Fe47a2c8dea8b451da551bc04f83bbb06?format=webp&width=800"
                 alt="JB Industries Logo"
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
               <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-gray-900">
                   JB Industries
                 </h1>
-                <p className="text-sm text-blue-600">Fastening Solution</p>
+                <p className="text-xl text-blue-600">
+                  Industries Fastening Solution
+                </p>
               </div>
             </Link>
             <nav className="hidden md:flex space-x-8">
@@ -83,18 +85,27 @@ export default function Certifications() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-50 to-blue-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section
+        className="relative py-20 overflow-hidden"
+        style={{
+          backgroundImage:
+            "url('https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F5e0e757386e147cfaa7d42522f9cf614?format=webp&width=800')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <Badge className="mb-6 bg-green-100 text-green-800 border-green-200">
+            <Badge className="mb-6 bg-white bg-opacity-20 text-white border-white border-opacity-30">
               <Verified className="h-3 w-3 mr-1" />
               ISO 45001:2018 Certified
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Quality Certifications
-              <span className="block text-blue-600">& Standards</span>
+              <span className="block text-green-300">& Standards</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto">
               Committed to the highest standards of quality, safety, and
               environmental responsibility in all our manufacturing processes.
             </p>
@@ -188,11 +199,27 @@ export default function Certifications() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button
+                    onClick={() =>
+                      window.open(
+                        "https://cdn.builder.io/o/assets%2Fca1cf24c6c334c83ba51991b9affb647%2Fab88a7a1eef24752876cb2e5fd03066b?alt=media&token=e61b2fc5-7697-4571-a3aa-01b53e561e05&apiKey=ca1cf24c6c334c83ba51991b9affb647",
+                        "_blank",
+                      )
+                    }
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
                     <Download className="mr-2 h-4 w-4" />
                     Download Certificate
                   </Button>
-                  <Button variant="outline">
+                  <Button
+                    onClick={() =>
+                      window.open(
+                        "https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F5e0e757386e147cfaa7d42522f9cf614?format=webp&width=800",
+                        "_blank",
+                      )
+                    }
+                    variant="outline"
+                  >
                     <Eye className="mr-2 h-4 w-4" />
                     View Full Certificate
                   </Button>
@@ -247,16 +274,6 @@ export default function Certifications() {
                       <CheckCircle className="h-4 w-4 mr-2" />
                       <span className="text-sm">Current & Valid</span>
                     </div>
-                    <div className="flex space-x-2 mt-4">
-                      <button className="bg-blue-600 text-white px-3 py-1 rounded flex items-center hover:bg-blue-700 transition-colors text-sm">
-                        <Download className="h-3 w-3 mr-1" />
-                        Download
-                      </button>
-                      <button className="border border-gray-300 text-gray-700 px-3 py-1 rounded flex items-center hover:bg-gray-50 transition-colors text-sm">
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </button>
-                    </div>
                   </div>
 
                   {/* ISO 14001:2015 - Compact Display */}
@@ -298,16 +315,6 @@ export default function Certifications() {
                       <CheckCircle className="h-4 w-4 mr-2" />
                       <span className="text-sm">Current & Valid</span>
                     </div>
-                    <div className="flex space-x-2 mt-4">
-                      <button className="bg-blue-600 text-white px-3 py-1 rounded flex items-center hover:bg-blue-700 transition-colors text-sm">
-                        <Download className="h-3 w-3 mr-1" />
-                        Download
-                      </button>
-                      <button className="border border-gray-300 text-gray-700 px-3 py-1 rounded flex items-center hover:bg-gray-50 transition-colors text-sm">
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </button>
-                    </div>
                   </div>
 
                   {/* ISO 45001:2018 - Compact Display */}
@@ -348,16 +355,6 @@ export default function Certifications() {
                     <div className="flex items-center text-green-600 mt-3">
                       <CheckCircle className="h-4 w-4 mr-2" />
                       <span className="text-sm">Current & Valid</span>
-                    </div>
-                    <div className="flex space-x-2 mt-4">
-                      <button className="bg-blue-600 text-white px-3 py-1 rounded flex items-center hover:bg-blue-700 transition-colors text-sm">
-                        <Download className="h-3 w-3 mr-1" />
-                        Download
-                      </button>
-                      <button className="border border-gray-300 text-gray-700 px-3 py-1 rounded flex items-center hover:bg-gray-50 transition-colors text-sm">
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </button>
                     </div>
                   </div>
                 </div>

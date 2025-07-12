@@ -20,10 +20,13 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { getCurrentUser, isLoggedIn, logout } from "@/lib/auth";
 
 export default function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [user, setUser] = useState(getCurrentUser());
+  const [userLoggedIn, setUserLoggedIn] = useState(isLoggedIn());
 
   const banners = [
     {
@@ -68,6 +71,24 @@ export default function Index() {
       title: "Luxury Automotive",
       subtitle: "Premium Fasteners for Luxury Vehicles",
     },
+    {
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F8a14e3d77dae4821a9786760c484a1db?format=webp&width=800",
+      title: "Premium Fastening Components",
+      subtitle: "High-Quality Steel Fasteners & Hardware Solutions",
+    },
+    {
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F3bb246b707364c0899a08b4b9ffba3c0?format=webp&width=800",
+      title: "Industrial Hardware Solutions",
+      subtitle: "Comprehensive Range of Nuts, Bolts & Fasteners",
+    },
+    {
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F21eca86535bb4f57b0979ccc68c6e08d?format=webp&width=800",
+      title: "Precision Machined Fasteners",
+      subtitle: "Advanced Manufacturing for Critical Applications",
+    },
   ];
 
   useEffect(() => {
@@ -77,16 +98,39 @@ export default function Index() {
     return () => clearInterval(timer);
   }, [banners.length]);
 
+  // Check for user state changes (e.g., after login)
+  useEffect(() => {
+    const checkUserState = () => {
+      setUser(getCurrentUser());
+      setUserLoggedIn(isLoggedIn());
+    };
+
+    // Check immediately
+    checkUserState();
+
+    // Listen for storage changes (when user logs in from another tab)
+    window.addEventListener("storage", checkUserState);
+
+    // Also check periodically in case of programmatic changes
+    const userCheckInterval = setInterval(checkUserState, 1000);
+
+    return () => {
+      window.removeEventListener("storage", checkUserState);
+      clearInterval(userCheckInterval);
+    };
+  }, []);
+
   const handleDownloadCatalog = () => {
-    // Create a temporary link to download catalog
-    const link = document.createElement("a");
-    link.href =
-      "https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2F7b58337c241a4b4089328bb5b65fb59d?format=webp&width=800";
-    link.download = "JB-Industries-Product-Catalog.pdf";
-    link.target = "_blank";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Open PDF in new tab
+    window.open(
+      "https://cdn.builder.io/o/assets%2Fca1cf24c6c334c83ba51991b9affb647%2Fab88a7a1eef24752876cb2e5fd03066b?alt=media&token=e61b2fc5-7697-4571-a3aa-01b53e561e05&apiKey=ca1cf24c6c334c83ba51991b9affb647",
+      "_blank",
+    );
+  };
+
+  const handleViewProducts = () => {
+    // Navigate to products page
+    window.location.href = "/products";
   };
 
   const handleViewCertificate = () => {
@@ -101,17 +145,20 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-3">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2Fe47a2c8dea8b451da551bc04f83bbb06?format=webp&width=800"
-                alt="JB Industries Logo"
-                className="h-10 w-auto"
-              />
-              <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  JB Industries
-                </h1>
-                <p className="text-xl text-blue-600">Fastening Solution</p>
-              </div>
+             <img
+  src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2Fe47a2c8dea8b451da551bc04f83bbb06?format=webp&width=800"
+  alt="JB Industries Logo"
+  className="h-16 w-auto"
+/>
+
+             <div className="hidden sm:block">
+  <h1 className="text-xl font-bold text-gray-900">
+    JB Industries
+  </h1>
+  <p className="text-sm text-blue-600">
+    Industries Fastening Solution
+  </p>
+</div>
             </Link>
 
             {/* Desktop Navigation */}
@@ -149,6 +196,34 @@ export default function Index() {
             </nav>
 
             <div className="flex items-center space-x-4">
+              {userLoggedIn && user ? (
+                <div className="hidden md:flex items-center space-x-3">
+                  <span className="text-sm text-gray-600">
+                    Welcome,{" "}
+                    <span className="font-semibold text-blue-600">
+                      {user.name}
+                    </span>
+                  </span>
+                  <Button
+                    onClick={logout}
+                    variant="outline"
+                    size="sm"
+                    className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login">
+                  <Button
+                    variant="outline"
+                    className="hidden md:block text-blue-600 border-blue-600 hover:bg-blue-50"
+                  >
+                    Login
+                  </Button>
+                </Link>
+              )}
+
               <Link to="/quote">
                 <Button className="hidden md:block bg-blue-600 hover:bg-blue-700 text-white">
                   Get Quote
@@ -208,6 +283,37 @@ export default function Index() {
                 >
                   Contact
                 </Link>
+                {userLoggedIn && user ? (
+                  <div className="border-t border-gray-200 pt-3 mt-3">
+                    <div className="px-3 py-2 text-sm">
+                      <span className="text-gray-600">Logged in as:</span>
+                      <div className="font-semibold text-blue-600">
+                        {user.name}
+                      </div>
+                      <div className="text-xs text-gray-500">{user.email}</div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      variant="outline"
+                      className="w-full mt-2 text-gray-600 border-gray-300"
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-3 text-blue-600 border-blue-600"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                )}
+
                 <Link to="/quote" onClick={() => setMobileMenuOpen(false)}>
                   <Button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white">
                     Get Quote
@@ -255,14 +361,13 @@ export default function Index() {
                       {banner.subtitle}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <Link to="/products">
-                        <Button
-                          size="lg"
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          View Products <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                      </Link>
+                      <Button
+                        size="lg"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={handleViewProducts}
+                      >
+                        View Products <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
                       <Button
                         size="lg"
                         variant="outline"
@@ -270,7 +375,7 @@ export default function Index() {
                         onClick={handleDownloadCatalog}
                       >
                         <Download className="mr-2 h-5 w-5" />
-                        Download Catalog
+                        Catalog
                       </Button>
                     </div>
                   </div>
@@ -302,6 +407,54 @@ export default function Index() {
           </p>
         </div>
       </section>
+
+      {/* Welcome Section for Logged In Users */}
+      {userLoggedIn && user && (
+        <section className="py-12 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <div className="inline-flex items-center space-x-2 mb-4">
+                <Users className="h-6 w-6 text-blue-600" />
+                <span className="text-blue-600 font-semibold">
+                  Welcome Back!
+                </span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                Hello, {user.name}! 👋
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Thank you for choosing JB Industries. Your account has been
+                successfully saved to our MongoDB Atlas database.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/products">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Package className="mr-2 h-4 w-4" />
+                    Browse Products
+                  </Button>
+                </Link>
+                <Link to="/contact">
+                  <Button
+                    variant="outline"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Contact Support
+                  </Button>
+                </Link>
+              </div>
+              <div className="mt-4 text-sm text-gray-500">
+                <span>Account: {user.email}</span>
+                {user.lastLogin && (
+                  <span className="ml-4">
+                    Last login: {new Date(user.lastLogin).toLocaleDateString()}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* About Section */}
       <section id="about" className="py-20">
@@ -442,86 +595,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Certifications Section */}
-      <section id="certifications" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Certifications & Quality
-            </h2>
-            <p className="text-xl text-gray-600">
-              Committed to the highest standards of quality and safety
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <div className="mb-8">
-                <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2F467a32e8f6aa4e6f97dfca13b16564e3?format=webp&width=800"
-                  alt="ISO 45001:2018 Certification & Quality Standards"
-                  className="w-full rounded-lg shadow-lg"
-                />
-              </div>
-              <Card className="border-2 border-blue-200 bg-blue-50">
-                <CardContent className="p-8">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <Award className="h-8 w-8 text-blue-600" />
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900">
-                        ISO 45001:2018
-                      </h3>
-                      <p className="text-gray-600">
-                        Occupational Health and Safety Management Systems
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <p>
-                      <strong>Certificate No:</strong> 22UO11BV
-                    </p>
-                    <p>
-                      <strong>Valid From:</strong> 30/01/2025 Until 22/11/2025
-                    </p>
-                    <p>
-                      <strong>Certified by:</strong> Royal Impact Certification
-                      Ltd.
-                    </p>
-                    <p>
-                      <strong>Scope:</strong> Manufacturing & Supply of High
-                      Tensile & Stainless Steel Fasteners & Machined Components
-                    </p>
-                  </div>
-                  <div className="mt-4 flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-green-600 font-medium">
-                      Current & Valid
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="text-center">
-              <div
-                className="cursor-pointer group"
-                onClick={handleViewCertificate}
-              >
-                <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2F536025be4d6244ff84d126cfe63225bb%2Fdc4511c749e540a3876a64aed480aee3"
-                  alt="ISO 45001:2018 Certificate"
-                  className="w-full max-w-md mx-auto rounded-lg shadow-lg border group-hover:shadow-xl transition-shadow duration-300"
-                />
-                <p className="mt-4 text-sm text-blue-600 hover:text-blue-800 transition-colors cursor-pointer flex items-center justify-center">
-                  <ExternalLink className="mr-1 h-4 w-4" />
-                  Click to view full certificate details
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Trusted by Leading Companies */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -538,218 +611,110 @@ export default function Index() {
             </p>
           </div>
 
-          {/* Horizontal Scrollable Company Logos */}
+          {/* Company Logos in 2 Rows */}
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="overflow-x-auto">
-              {/* <div className="flex space-x-8 items-center justify-start min-w-max pb-4">
+            {/* Row 1 */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-6">
+              {/* FRICK */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/m.webp"
+                  alt="FRICK Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
 
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                image:
+              {/* MAHINDRA */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/f.png"
+                  alt="Mahindra Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
 
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-red-600 to-red-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      MAHINDRA
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-green-600 to-green-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">LGB</span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-purple-600 to-purple-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      SANSERA
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-orange-600 to-orange-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      FASTENAL
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-indigo-600 to-indigo-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      BOSSARD
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-teal-600 to-teal-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">REYHER</span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-cyan-600 to-cyan-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      C&S ELECTRIC
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-pink-600 to-pink-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">WÜRTH</span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-gray-600 to-gray-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">
-                      VIZAG STEEL
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      JACKSON
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-blue-800 to-blue-900 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">SAIL</span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-green-800 to-green-900 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">
-                      INDO FARM
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-red-800 to-red-900 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">L&T</span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-purple-800 to-purple-900 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">
-                      TEXMO IND.
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 bg-gradient-to-r from-indigo-800 to-indigo-900 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">
-                      HELICAL TECH
-                    </span>
-                  </div>
-                </div>
-              </div> */}
+              {/* LGB */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/b.png"
+                  alt="LGB Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
 
-              <div className="flex space-x-8 items-center justify-start min-w-max pb-4">
-                {/* FRICK */}
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/m.webp"
-                      alt="FRICK Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
+              {/* FASTENAL */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/ff.png"
+                  alt="Fastenal Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
 
-                {/* MAHINDRA */}
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/f.png"
-                      alt="Mahindra Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
-
-                {/* LGB */}
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/b.png"
-                      alt="LGB Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/ff.png"
-                      alt="LGB Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/l.png"
-                      alt="LGB Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/s.jpg"
-                      alt="LGB Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/ss.jfif"
-                      alt="LGB Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/mm.png"
-                      alt="LGB Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
-                <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="w-24 h-16 rounded flex items-center justify-center">
-                    <img
-                      src="image/ll.jfif"
-                      alt="LGB Logo"
-                      className="h-full object-contain"
-                    />
-                  </div>
-                </div>
+              {/* SANSERA */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/l.png"
+                  alt="Sansera Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
               </div>
             </div>
 
-            {/* Scroll indicator */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">
-                ← Scroll horizontally to view all partners →
+            {/* Row 2 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* BOSSARD */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/s.jpg"
+                  alt="Bossard Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
+
+              {/* REYHER */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/ss.jfif"
+                  alt="Reyher Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
+
+              {/* C&S ELECTRIC */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/mm.png"
+                  alt="C&S Electric Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
+
+              {/* WÜRTH */}
+              <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <img
+                  src="image/ll.jfif"
+                  alt="Würth Logo"
+                  className="h-12 w-20 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Company Names */}
+            <div className="mt-8 text-center">
+              <p className="text-sm text-gray-600 font-medium">
+                Trusted by Leading Companies: Frick • Mahindra • LGB • Fastenal
+                • Sansera • Bossard • Reyher • C&S Electric • Würth
               </p>
-              <p className="text-sm text-gray-600 font-medium mt-2">
-                Trusted by Leading Companies: Frick • Mahindra • LGB • Sansera •
-                Fastenal • Bossard • Reyher • C&S Electric • Würth • Vizag Steel
-                • Jackson • SAIL • Indo Farm • L&T • Texmo Industries • Helical
-                Technology
-              </p>
+              <div className="flex justify-center mt-4">
+                <Badge
+                  variant="outline"
+                  className="text-green-700 border-green-200 bg-green-50"
+                >
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  200+ Satisfied Clients Worldwide
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
@@ -814,267 +779,6 @@ export default function Index() {
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Client Testimonials */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Trusted by Industry Leaders
-            </h2>
-            <p className="text-xl text-gray-600">
-              Serving renowned companies across various sectors
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2F6ade181f2ec44eb583f3d4ded7e07d29?format=webp&width=800"
-              alt="Our Valued Clients - Page 1"
-              className="w-full rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-            />
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2F47176efd797644b58054c04654c9e6e2?format=webp&width=800"
-              alt="Our Industry Partners - Page 2"
-              className="w-full rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-            />
-          </div>
-
-          <div className="text-center">
-            <p className="text-lg text-gray-600 mb-8">
-              We are proud to serve leading companies across automotive,
-              electronics, heavy machinery, wind power, thermal power, metro &
-              railways, and electrical sectors.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Thank You Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2F99ae306a06994212a8004a55516855b7?format=webp&width=800"
-              alt="Thank You for Your Trust - JB Industries Greetings"
-              className="w-full max-w-2xl mx-auto rounded-lg shadow-lg mb-8"
-            />
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Thank You for Your Trust
-            </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Together we are moving forwards, building stronger partnerships
-              and delivering excellence in every fastening solution.
-            </p>
-            <Link to="/about">
-              <Button
-                size="lg"
-                className="bg-white text-blue-600 hover:bg-gray-100"
-              >
-                Learn More About Us
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Get In Touch
-            </h2>
-            <p className="text-xl text-gray-600">
-              Ready to discuss your fastening requirements?
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Contact Information
-              </h3>
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <MapPin className="h-6 w-6 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">
-                      Our Location
-                    </h4>
-                    <p className="text-gray-600">
-                      Plot no. 107, Gaddi Khedi Road
-                      <br />
-                      HSIIDC Industrial Area
-                      <br />
-                      Rohtak, Haryana 124001
-                      <br />
-                      India
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <Phone className="h-6 w-6 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Phone</h4>
-                    <p className="text-gray-600">Available on request</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <Mail className="h-6 w-6 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Email</h4>
-                    <p className="text-gray-600">info@jbindustries.com</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-                <h4 className="font-semibold text-gray-900 mb-2">
-                  Business Hours
-                </h4>
-                <p className="text-gray-600 text-sm">
-                  Monday - Saturday: 9:00 AM - 6:00 PM
-                  <br />
-                  Sunday: Closed
-                </p>
-              </div>
-            </div>
-
-            <Card className="border-gray-200">
-              <CardContent className="p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">
-                  Send us a Message
-                </h3>
-                <form className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Your Name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Subject
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Inquiry about fasteners"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Message
-                    </label>
-                    <textarea
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Tell us about your requirements..."
-                    ></textarea>
-                  </div>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                    Send Message
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Quote Widget */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Need a Quick Quote?
-            </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
-              Get instant pricing for standard fasteners or request a custom
-              quote for specialized requirements
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Quick Quote Card */}
-            <div className="bg-white rounded-lg p-8 shadow-xl">
-              <div className="text-center mb-6">
-                <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-                  <Package className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Standard Products
-                </h3>
-                <p className="text-gray-600">
-                  Get instant quotes for our standard fastener range
-                </p>
-              </div>
-              <Link to="/contact">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3">
-                  Get Instant Quote
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* Custom Quote Card */}
-            <div className="bg-white rounded-lg p-8 shadow-xl">
-              <div className="text-center mb-6">
-                <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-                  <Factory className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Custom Manufacturing
-                </h3>
-                <p className="text-gray-600">
-                  Specialized components made to your specifications
-                </p>
-              </div>
-              <Link to="/contact">
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3">
-                  Request Custom Quote
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Contact Info for Urgent Requests */}
-          <div className="mt-12 text-center">
-            <p className="text-blue-100 mb-4">
-              <strong>Urgent Requirements?</strong> Call us directly for
-              immediate assistance
-            </p>
-            <div className="flex flex-wrap justify-center gap-8 text-white">
-              <div className="flex items-center">
-                <Phone className="h-5 w-5 mr-2" />
-                <span className="font-semibold">+91-1262-277721</span>
-              </div>
-              <div className="flex items-center">
-                <Mail className="h-5 w-5 mr-2" />
-                <span className="font-semibold">jkindustries09@gmail.com</span>
               </div>
             </div>
           </div>

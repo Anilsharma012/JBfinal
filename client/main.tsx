@@ -20,6 +20,7 @@ import Quote from "./pages/Quote";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminProducts from "./pages/admin/Products";
+import AdminLogin from "./pages/admin/AdminLogin";
 import Analytics from "./pages/admin/Analytics";
 import Users from "./pages/admin/Users";
 import Settings from "./pages/admin/Settings";
@@ -47,7 +48,9 @@ const App = () => (
 
         {/* ✅ Admin/Dashboard Routes */}
         <Route path="/login" element={<Login />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="/admin/analytics" element={<Analytics />} />
         <Route path="/admin/users" element={<Users />} />

@@ -65,8 +65,10 @@ export default function Products() {
 
   const handleAddProduct = async (formData: ProductFormData) => {
     setIsLoading(true);
+    console.log("Attempting to create product with data:", formData);
     try {
-      await apiService.createProduct(formData);
+      const result = await apiService.createProduct(formData);
+      console.log("Product creation result:", result);
       await loadProducts(); // Reload products from database
       setIsFormOpen(false);
       setSelectedProduct(null);
@@ -79,7 +81,7 @@ export default function Products() {
       console.error("Error adding product:", error);
       toast({
         title: "Error",
-        description: "Failed to add product",
+        description: `Failed to add product: ${error.message}`,
         variant: "destructive",
       });
     } finally {

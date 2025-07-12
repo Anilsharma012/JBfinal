@@ -109,9 +109,10 @@ export const getProductStats = async (req, res) => {
     res.json({
       success: true,
       data: {
-        total: totalProducts,
-        inStock,
-        outOfStock,
+        totalProducts,
+        inStockProducts: inStock,
+        outOfStockProducts: outOfStock,
+        totalRevenue: 0, // TODO: Calculate from product prices when orders are implemented
       },
     });
   } catch (error) {

@@ -13,12 +13,63 @@ import {
   TrendingUp,
   Menu,
   X,
+  ArrowRight,
+  Download,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function About() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const banners = [
+    {
+      image: "/image/A.jpg",
+      title: "About JB Industries",
+      subtitle: "Leading Manufacturer of Fastening Solutions Since 2019",
+    },
+    {
+      image: "/image/B.jpg",
+      title: "Quality Manufacturing",
+      subtitle: "ISO 45001:2018 Certified Excellence in Production",
+    },
+    {
+      image: "/image/C.jpg",
+      title: "Advanced Technology",
+      subtitle: "State-of-the-art Manufacturing Facilities",
+    },
+    {
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F8a14e3d77dae4821a9786760c484a1db?format=webp&width=800",
+      title: "Premium Components",
+      subtitle: "High-Quality Steel Fasteners & Hardware Solutions",
+    },
+    {
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F3bb246b707364c0899a08b4b9ffba3c0?format=webp&width=800",
+      title: "Complete Solutions",
+      subtitle: "Comprehensive Range of Industrial Hardware",
+    },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [banners.length]);
+
+  const handleDownloadCatalog = () => {
+    window.open(
+      "https://cdn.builder.io/o/assets%2Fca1cf24c6c334c83ba51991b9affb647%2Fab88a7a1eef24752876cb2e5fd03066b?alt=media&token=e61b2fc5-7697-4571-a3aa-01b53e561e05&apiKey=ca1cf24c6c334c83ba51991b9affb647",
+      "_blank",
+    );
+  };
+
+  const handleViewProducts = () => {
+    window.location.href = "/products";
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -30,13 +81,15 @@ export default function About() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2Fe47a2c8dea8b451da551bc04f83bbb06?format=webp&width=800"
                 alt="JB Industries Logo"
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
               <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-gray-900">
                   JB Industries
                 </h1>
-                <p className="text-sm text-blue-600">Fastening Solution</p>
+                <p className="text-xl text-blue-600">
+                  Industries Fastening Solution
+                </p>
               </div>
             </Link>
 
@@ -158,23 +211,86 @@ export default function About() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-50 to-blue-50 py-20">
+      {/* Hero Banner Slider */}
+      <section className="relative h-[70vh] overflow-hidden">
+        <div className="relative w-full h-full">
+          {banners.map((banner, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentSlide ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div
+                className="w-full h-full bg-cover bg-center relative"
+                style={{ backgroundImage: `url(${banner.image})` }}
+              >
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+
+                {/* JB Industries Watermark */}
+                <div className="absolute top-4 right-4 opacity-20">
+                  <img
+                    src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2Fb733383f99d740dca5d656219d6f58b6?format=webp&width=800"
+                    alt="JB Industries Watermark"
+                    className="h-16 w-auto filter invert"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center text-white px-4 max-w-4xl">
+                    <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                      {banner.title}
+                    </h1>
+                    <p className="text-xl md:text-2xl mb-8 opacity-90">
+                      {banner.subtitle}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Button
+                        size="lg"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={handleViewProducts}
+                      >
+                        View Products <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="border-white text-white hover:bg-white hover:text-gray-900"
+                        onClick={handleDownloadCatalog}
+                      >
+                        <Download className="mr-2 h-5 w-5" />
+                        Download Catalog
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Slider Indicators */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                index === currentSlide ? "bg-white" : "bg-white bg-opacity-50"
+              }`}
+              onClick={() => setCurrentSlide(index)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Company Banner */}
+      <section className="bg-blue-600 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <Badge className="mb-6 bg-blue-100 text-blue-800 border-blue-200">
-              About JB Industries
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Leading Manufacturer of
-              <span className="block text-blue-600">Fastening Solutions</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Established as a proprietorship business under the leadership of
-              Rajni Jain, JB Industries has been delivering excellence in
-              manufacturing high-quality fastening solutions since 2019.
-            </p>
-          </div>
+          <p className="text-center text-white font-medium">
+            Your Trusted Partner for Industrial Fastening Solutions Since 2019
+          </p>
         </div>
       </section>
 

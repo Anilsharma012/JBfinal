@@ -2,7 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import productRoutes from "./routes/products.js";
+import productRoutes from "./routes/products.ts";
+import adminAuthRoutes from "./routes/adminAuth.js";
+import userAuthRoutes from "./routes/userAuth.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -20,24 +22,36 @@ export const createServer = () => {
     "http://localhost:3000",
     "http://localhost:4000",
     "http://localhost:8080",
+    "http://localhost:8081",
     "https://jbindustries.netlify.app/",
   ];
 
-  app.use(cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, etc.)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  }));
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+
+        // In development, allow any localhost origin
+        if (origin && origin.includes("localhost")) {
+          return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        } else {
+          console.log("CORS blocked origin:", origin);
+          return callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+    }),
+  );
 
   app.use(express.json());
   app.use("/api/products", productRoutes);
+  app.use("/api/admin", adminAuthRoutes);
+  app.use("/api/auth", userAuthRoutes);
 
   return app;
 };

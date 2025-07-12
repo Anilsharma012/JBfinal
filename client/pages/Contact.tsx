@@ -31,13 +31,15 @@ export default function Contact() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F955730e514434f058fe2d673677d0799%2Fe47a2c8dea8b451da551bc04f83bbb06?format=webp&width=800"
                 alt="JB Industries Logo"
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
               <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-gray-900">
                   JB Industries
                 </h1>
-                <p className="text-sm text-blue-600">Fastening Solution</p>
+                <p className="text-xl text-blue-600">
+                  Industries Fastening Solution
+                </p>
               </div>
             </Link>
 
@@ -160,17 +162,26 @@ export default function Contact() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-50 to-blue-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section
+        className="relative py-20 overflow-hidden"
+        style={{
+          backgroundImage:
+            "url('https://cdn.builder.io/api/v1/image/assets%2Fca1cf24c6c334c83ba51991b9affb647%2F60760d4360d04069b1e6013ffe965884?format=webp&width=800')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-blue-900 bg-opacity-70"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <Badge className="mb-6 bg-blue-100 text-blue-800 border-blue-200">
+            <Badge className="mb-6 bg-white bg-opacity-20 text-white border-white border-opacity-30">
               Get In Touch
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Contact
-              <span className="block text-blue-600">JB Industries</span>
+              <span className="block text-blue-300">JB Industries</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
               Ready to discuss your fastening requirements? Our team is here to
               help you find the perfect solution for your business needs.
             </p>

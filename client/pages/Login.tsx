@@ -25,22 +25,121 @@ export default function Login() {
     setError("");
 
     try {
-      // Add your login logic here
-      console.log("Login attempt:", { email, password });
+      console.log("Login attempt:", { email, password: "***" });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Check if it's admin credentials first
+      if (email === "admin@jbindustries.com" && password === "admin123") {
+        try {
+          const response = await fetch("/api/admin/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: email.trim(),
+              password: password,
+            }),
+          });
 
-      // For demo purposes - replace with actual authentication
-      if (email === "admin@example.com" && password === "admin123") {
-        alert("Login successful!");
-        // Redirect to dashboard or home
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            if (data.token) {
+              localStorage.setItem("adminToken", data.token);
+            }
+            window.location.href = "/admin/dashboard";
+            return;
+          }
+        } catch (apiError) {
+          console.error("Admin API error:", apiError);
+        }
+      }
+
+      // Try regular user login
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Store user token
+        if (data.token) {
+          localStorage.setItem("userToken", data.token);
+        }
+
+        // Store user info
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+
+        // Success message
+        alert(`Welcome back, ${data.user?.name || email}!`);
+
+        // Redirect to home page
         window.location.href = "/";
+        return;
       } else {
-        setError("Invalid email or password");
+        // If user doesn't exist, show registration option
+        if (data.message === "Invalid email or password") {
+          const shouldRegister = confirm(
+            "User not found. Would you like to create a new account?",
+          );
+
+          if (shouldRegister) {
+            // Auto-register the user
+            const name = prompt("Please enter your full name:");
+            if (name) {
+              const registerResponse = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  email: email.trim(),
+                  password: password,
+                  name: name.trim(),
+                }),
+              });
+
+              const registerData = await registerResponse.json();
+
+              if (registerResponse.ok && registerData.success) {
+                // Store tokens
+                if (registerData.token) {
+                  localStorage.setItem("userToken", registerData.token);
+                }
+                if (registerData.user) {
+                  localStorage.setItem(
+                    "user",
+                    JSON.stringify(registerData.user),
+                  );
+                }
+
+                alert(
+                  `Welcome ${registerData.user?.name}! Your account has been created.`,
+                );
+                window.location.href = "/";
+                return;
+              } else {
+                setError(registerData.message || "Failed to create account");
+              }
+            }
+          }
+        } else {
+          setError(data.message || "Invalid email or password");
+        }
       }
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      console.error("Login error:", err);
+      setError("Network error. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -114,9 +213,16 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-center space-y-2">
               <p className="text-sm text-gray-600">
-                Demo credentials: admin@example.com / admin123
+                Enter any email/password to create a new account automatically
+              </p>
+              <p className="text-sm text-gray-600">
+                Admin access: admin@jbindustries.com / admin123
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                New users will be saved to MongoDB Atlas - jb-industries
+                collection
               </p>
             </div>
           </CardContent>
